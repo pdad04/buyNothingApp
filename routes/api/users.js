@@ -54,7 +54,8 @@ router.post("/",
 
       // Prepare and sign JWT
       const payload = {
-        _id: newUserId
+        _id: newUserId,
+        name: newUser.name
       };
 
       jwt.sign(
@@ -76,7 +77,7 @@ router.post("/login",
   async (req, res) => {
     try {
       const user = await db.getDb().db().collection("users").findOne({email: req.body.email});
-      
+
       if(!user){
         return res.status(400).json({message: "Invalid Credentials"})
       }

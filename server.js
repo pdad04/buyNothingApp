@@ -12,6 +12,7 @@ app.get("/", (req, res ) => res.send({ msg: "API Running" }));
 // Define routes
 app.use("/api/users", require("./routes/api/users"));
 app.use("/api/posts", require("./routes/api/posts"));
+app.use("/api/comments", require("./routes/api/comments"));
 
 const PORT = process.env.PORT || 5000;
 

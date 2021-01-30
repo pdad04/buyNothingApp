@@ -28,8 +28,10 @@ router.post("/create",
     try {
      const newPost = {
        user: req.user,
+       userName: req.userName,
        title: req.body.title,
        text: req.body.text,
+       createdAt: new Date()
      }
 
      if(req.file){
@@ -39,7 +41,7 @@ router.post("/create",
      }
 
      await db.getDb().db().collection("posts").insertOne(newPost);
-     console.log(newPost);
+     
      res.status(200).json(newPost);
 
     } catch (error) {
