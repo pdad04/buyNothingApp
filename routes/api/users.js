@@ -55,7 +55,8 @@ router.post("/",
       // Prepare and sign JWT
       const payload = {
         _id: newUserId,
-        name: newUser.name
+        name: newUser.name,
+        location: newUser.location.coordinates
       };
 
       jwt.sign(
@@ -88,7 +89,9 @@ router.post("/login",
       }
 
       const payload = {
-        _id: user._id
+        _id: user._id,
+        name: user.name,
+        location: user.location.coordinates
       };
 
       jwt.sign(

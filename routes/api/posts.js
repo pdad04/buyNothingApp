@@ -25,10 +25,17 @@ router.post("/create",
       return res.status(400).json({ errors: errors.array()})
     }
 
+    // Convert location array of strings into numbers to store in DB
+    const location = req.location.map(el => parseFloat(el))
+
     try {
      const newPost = {
        user: req.user,
        userName: req.userName,
+       location: {
+         type: "Point",
+         coordinates: location
+       },
        title: req.body.title,
        text: req.body.text,
        createdAt: new Date()
@@ -137,5 +144,33 @@ router.get("/", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+// @route   GET api/posts/filter?distance={number}&lon={longitude}&lat={latitude}
+// @desc    Get posts within a certain distance of user
+// @access  Public
+router.get("/filter", async(req,res) => {
+  try {
+    const filteredPosts = [];
+    const posts = await db.getDb().db().collection("posts").find(
+      {
+        location:
+          { $near :
+             {
+               $geometry: { type: "Point",  coordinates: [ parseFloat(req.query.long), parseFloat(req.query.lat) ] },
+               $maxDistance: parseInt(req.query.distance)
+             }
+          }
+      }
+   );
+   await posts.forEach(post => {
+     filteredPosts.push(post);
+   });
+
+   res.status(200).json(filteredPosts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server Error");
+  }
+})
 
 module.exports = router;
