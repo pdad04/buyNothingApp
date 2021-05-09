@@ -80,12 +80,12 @@ router.post("/login",
       const user = await db.getDb().db().collection("users").findOne({email: req.body.email});
 
       if(!user){
-        return res.status(400).json({message: "Invalid Credentials"})
+        return res.status(400).json({errors: [{message: "Invalid Credentials"}]})
       }
       const correctPassword = await bcrypt.compare(req.body.password,user.password);
 
       if(!correctPassword){
-        return res.status(400).json({message: "Invalid Credentials"})
+        return res.status(400).json({errors: [{message: "Invalid Credentials"}]})
       }
 
       const payload = {
