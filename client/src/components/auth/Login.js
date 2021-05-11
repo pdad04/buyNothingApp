@@ -4,7 +4,7 @@ import alerts from "../Layout/Alerts";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-const Login = () => {
+const Login = (props) => {
   const [formData, setFormDate] = useState({
     email: "",
     password: "",
@@ -19,10 +19,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await login(email, password);
+
     if(res.status !== 200){
-      alerts(res);
+      props.error(res.data.errors);
+    }else{
+      props.error([])
+      window.localStorage.setItem("token", res.data.token);
     }
+
   }
+
   return (
     <Fragment>
       <Form onSubmit={handleSubmit}>
