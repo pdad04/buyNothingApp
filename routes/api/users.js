@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
 const router = express.Router();
 const db = require("../../db");
 const { body, validationResult } = require('express-validator');
@@ -14,24 +15,28 @@ router.post("/",
   body("name", "Name is required").not().isEmpty(),
   body("email", "Valid Email is required").isEmail(),
   body("password","Password must be at least 6 characters").isLength({min: 6}),
-  body("location", "City and State are required").not().isEmpty(),
+  body("location", "Zip Code is required").not().isEmpty(),
   async (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
       return res.status(400).json({ errors: errors.array()});
     }
 
-    const { name, email, password, location = null } = req.body
+    const locationRes = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?components=postal_code:${req.body.location}&key=${process.env.GOOGLEMAP}`);
+    const locationCoords = locationRes.data.results[0].geometry.location;
+    const location = [locationCoords.lng, locationCoords.lat];
+
+    const { name, email, password } = req.body
     
     // Check if input email already exists in DB.
     try {
      const existingEmail =  await db.getDb().db().collection("users").findOne({email});
 
-     if(existingEmail) return res.status(400).json({message: "Email is already in use"})
+     if(existingEmail) return res.status(400).json({errors: [{msg: "Email is already in use"}]})
 
     } catch (error) {
       console.log(error);
-      res.status(500).json({message: "Server Error"})
+      res.status(500).json({msg: "Server Error"})
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -68,7 +73,7 @@ router.post("/",
         }
       )
     } catch (error) {
-      res.status(500).json({ message: error})
+      res.status(500).json({ msg: error})
     }
 });
 
@@ -80,12 +85,12 @@ router.post("/login",
       const user = await db.getDb().db().collection("users").findOne({email: req.body.email});
 
       if(!user){
-        return res.status(400).json({errors: [{message: "Invalid Credentials"}]})
+        return res.status(400).json({errors: [{msg: "Invalid Credentials"}]})
       }
       const correctPassword = await bcrypt.compare(req.body.password,user.password);
 
       if(!correctPassword){
-        return res.status(400).json({errors: [{message: "Invalid Credentials"}]})
+        return res.status(400).json({errors: [{msg: "Invalid Credentials"}]})
       }
 
       const payload = {

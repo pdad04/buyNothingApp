@@ -10,6 +10,7 @@ import Posts from "./components/Layout/Posts";
 import { Landing } from "./components/Layout/Landing";
 import "./App.css";
 import Alerts from "./components/Layout/Alerts";
+import CreateUser from "./components/Layout/CreateUser";
 
 function App() {
   const [errors, setErrors] = useState([]);
@@ -34,6 +35,10 @@ function App() {
             <Route 
               exact path="/posts" 
               render={(props) => (<Posts token={token} {...props} />)} 
+            />
+            <Route 
+              exact path="/register"
+              render={ token ? (props) => <Redirect to="/posts" {...props} /> : (props) => (<CreateUser error={setErrors} isLoggedIn={setToken} {...props} />)}
             />
           </Switch>
         </Container>

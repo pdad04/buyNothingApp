@@ -3,6 +3,7 @@ import { login } from "../../actions/auth";
 import alerts from "../Layout/Alerts";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import { NavLink } from "react-router-dom";
 
 const Login = (props) => {
   const [formData, setFormDate] = useState({
@@ -55,6 +56,7 @@ const Login = (props) => {
         </Form.Group>
       
       <Button variant="outline-dark" type="submit">Login</Button>
+      <p>Don't have an account? <NavLink to="/register">Register Here</NavLink></p>
       </Form>
     </Fragment>
   )
