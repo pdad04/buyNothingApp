@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, {useEffect, useState, Fragment} from "react";
+import DayJS from "react-dayjs";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -33,6 +34,9 @@ function Posts(props) {
                 <Row>
                   <Col xs="6" lg="5">{post.userName}</Col>
                   <Col><h6>{post.title}</h6></Col>
+                  <Col xs="6" lg="2"><small>Posted:
+                    <DayJS format=" MMM DD, YYYY">{post.createdAt}</DayJS></small>
+                  </Col>
                 </Row>
               </Card.Header>
               <Card.Body>
