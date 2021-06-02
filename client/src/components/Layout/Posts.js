@@ -1,19 +1,25 @@
 import axios from "axios";
 import React, {useEffect, useState, Fragment} from "react";
 import DayJS from "react-dayjs";
+import jwtDecode from "jwt-decode";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
+import Collapse from "react-bootstrap/Collapse";
 import {allPosts} from "../../actions/posts";
+import Comments from "./Comments";
 
 function Posts(props) {
   const [posts, setPosts] = useState([])
+  const [open, setOpen] = useState(false);
+  const [targetComment, setTargetComment] = useState(null)
+  const decoded = props.token ? jwtDecode(props.token) : null;
+  const currentUser = decoded?._id;
 
   useEffect(() => {
-
     async function getPosts() {
       const res = await allPosts();
       setPosts([...posts, ...res.data]);
@@ -23,12 +29,17 @@ function Posts(props) {
     
   },[]);
 
+  const onClick = (id) => {
+    setTargetComment(id)
+    setOpen(!open)
+  }
+
   return (
     props.token ? 
       <Container>
         {posts.map( (post,idx)=>
-        <Row className="justify-content-sm-center" style={{"margin-top": "2rem"}}>
-          <Col lg="12" key={idx}>
+        <Row className="justify-content-sm-center" style={{"marginTop": "2rem"}} key={idx}>
+          <Col lg="12">
             <Card border="dark">
               <Card.Header>
                 <Row>
@@ -48,8 +59,32 @@ function Posts(props) {
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <Button variant="outline-dark" size="sm">Comment</Button>
+                 <Button variant="outline-dark" size="sm" onClick={() => onClick(idx)} aria-expanded={open} aria-controls={idx}>Comment <i className="far fa-comment-alt"></i></Button>
               </Card.Footer>
+              <Collapse in={targetComment === idx ? open : false}>
+                <div id={idx} style={{"marginTop": "0.5rem", "marginLeft":"0.5rem"}}>
+                  <Comments />
+                </div>
+              </Collapse>
+              {post.comments ? post.comments.map((comment,idx) => 
+                <Row key={comment._id} style={{marginTop:"0.5rem", marginBottom:"0.5rem"}} noGutters>
+                  <Card bg="dark" text="light" style={{marginLeft:"0.5rem"}}>
+                    <Row className="align-items-center" style={{padding:"0.5rem"}}>
+                      <Col xs="auto">
+                          <Card.Text className="lead"><small>{comment.text}</small></Card.Text>
+                      </Col>
+                      <Col xs="auto">
+                        <small><DayJS format="MMM DD, YYYY">{Comment.createdAt}</DayJS></small>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col style={{marginLeft:"0.5rem", marginBottom:"0.25rem"}}>
+                        {comment.userId === currentUser ? <Button variant="danger" size="sm"><i className="far fa-trash-alt"></i></Button> : <></>}
+                      </Col>
+                    </Row>
+                  </Card>
+                </Row>
+              ) : <></>}
             </Card>
           </Col>
         </Row>)}
