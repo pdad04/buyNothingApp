@@ -24,7 +24,7 @@ export const register = async(formData) => {
       "Content-Type": "application/json",
     }
   };
-  console.log(formData);
+  
   const body = JSON.stringify(formData);
 
   try {

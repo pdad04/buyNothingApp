@@ -15,19 +15,21 @@ import Comments from "./Comments";
 function Posts(props) {
   const [posts, setPosts] = useState([])
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [targetComment, setTargetComment] = useState(null)
   const decoded = props.token ? jwtDecode(props.token) : null;
   const currentUser = decoded?._id;
 
   useEffect(() => {
-    async function getPosts() {
+    const getPosts = async () => {
       const res = await allPosts();
-      setPosts([...posts, ...res.data]);
-    };
-
+      setPosts([...res.data])
+    }
+ 
     getPosts();
+    setIsLoading(false)
     
-  },[]);
+  },[isLoading]);
 
   const onClick = (id) => {
     setTargetComment(id)
@@ -63,12 +65,17 @@ function Posts(props) {
               </Card.Footer>
               <Collapse in={targetComment === idx ? open : false}>
                 <div id={idx} style={{"marginTop": "0.5rem", "marginLeft":"0.5rem"}}>
-                  <Comments />
+                  <Comments 
+                    token={props.token}
+                    postId={post._id}
+                    isLoading={isLoading}
+                    setIsLoading={setIsLoading} 
+                  />
                 </div>
               </Collapse>
               {post.comments ? post.comments.map((comment,idx) => 
                 <Row key={comment._id} style={{marginTop:"0.5rem", marginBottom:"0.5rem"}} noGutters>
-                  <Card bg="dark" text="light" style={{marginLeft:"0.5rem"}}>
+                  <Card bg="dark" text="light" style={{marginLeft:"0.5rem", marginRight: "0.5rem"}}>
                     <Row className="align-items-center" style={{padding:"0.5rem"}}>
                       <Col xs="auto">
                           <Card.Text className="lead"><small>{comment.text}</small></Card.Text>
