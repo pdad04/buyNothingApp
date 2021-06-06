@@ -34,7 +34,7 @@ function App() {
             />
             <Route 
               exact path="/posts" 
-              render={(props) => (<Posts token={token} {...props} />)} 
+              render={(props) => (<Posts token={token} error={setErrors} {...props} />)} 
             />
             <Route 
               exact path="/register"

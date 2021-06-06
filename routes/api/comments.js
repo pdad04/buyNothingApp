@@ -73,10 +73,21 @@ router.patch("/:commentId/update", auth, body("text", "Comment text is required"
 // @access Private
 router.delete("/:commentId/remove", auth, async (req, res) => {
   try {
-    const post = await db.getDb().db().collection("posts").findOne({"comments._id": new ObjectID(req.params.commentId)}, {comments: { $elemMatch: { _id: new ObjectID(req.params.commentId) }}})
+    const post = await db.getDb().db().collection("posts").aggregate([
+      {
+        '$unwind': {
+          'path': '$comments', 
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$match': {
+          'comments._id': new ObjectID(`${req.params.commentId}`)
+        }
+      }
+    ]).toArray();
     
-    if(req.user !== post.comments[0].userId){
-      return res.status(401).json({message: "Only the comment creator can delete the comment"});
+    if(req.user !== post[0].comments.userId){
+      return res.status(401).json({errors: [{msg: "Only the comment creator can delete the comment"}]});     
     }
 
     await db.getDb().db().collection("posts").updateOne({ "comments._id": new ObjectID(req.params.commentId)}, { $pull: { comments : { _id: new ObjectID(req.params.commentId)}}});

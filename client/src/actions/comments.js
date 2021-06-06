@@ -12,9 +12,25 @@ export const createComment = async (formData, token, postId) => {
   
   try {
     const res = await axios.post(`/api/comments/${postId}/create`, body, config);
-    console.log(res);
+    
   } catch (error) {
     
   }
 
+}
+
+export const deleteComment = async (commentId, token) => {
+  const config = {
+    headers:{
+      "Authorization": `Bearer ${token}`
+    }
+  }
+  
+  try {
+    const res = await axios.delete(`/api/comments/${commentId}/remove`, config);
+    return res;
+  } catch (error) {
+    return error
+    console.log(error);
+  }
 }

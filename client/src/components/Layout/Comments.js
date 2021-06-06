@@ -36,7 +36,7 @@ function Comments(props) {
           </Form.Group>
         </Col>
         <Col xs="auto">
-          <Button type="submit" size="sm" variant="outline-dark">Submit</Button>
+          <Button type="submit" size="sm" variant="outline-dark" disabled={text ? false : true}>Submit</Button>
         </Col>
       </Form.Row>
     </Form>

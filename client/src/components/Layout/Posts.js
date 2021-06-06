@@ -10,6 +10,7 @@ import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 import Collapse from "react-bootstrap/Collapse";
 import {allPosts} from "../../actions/posts";
+import {deleteComment} from "../../actions/comments";
 import Comments from "./Comments";
 
 function Posts(props) {
@@ -34,6 +35,12 @@ function Posts(props) {
   const onClick = (id) => {
     setTargetComment(id)
     setOpen(!open)
+  }
+
+  const removeComment =  async (commentId) => {
+    setIsLoading(!isLoading);
+    const res = await deleteComment(commentId, props.token)
+
   }
 
   return (
@@ -86,7 +93,7 @@ function Posts(props) {
                     </Row>
                     <Row>
                       <Col style={{marginLeft:"0.5rem", marginBottom:"0.25rem"}}>
-                        {comment.userId === currentUser ? <Button variant="danger" size="sm"><i className="far fa-trash-alt"></i></Button> : <></>}
+                        {comment.userId === currentUser ? <Button variant="danger" size="sm" onClick={() => removeComment(comment._id)}><i className="far fa-trash-alt"></i></Button> : <></>}
                       </Col>
                     </Row>
                   </Card>
